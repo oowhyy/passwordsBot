@@ -1,6 +1,6 @@
 
 telegram:
-  token: 5878743826:AAE3glYPcHVULRyPMZfxnPeEGayDrRRTgcA
+  token: <MyToken>
   port: 8080
 redis:
   host: localhost
