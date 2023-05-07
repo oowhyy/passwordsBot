@@ -1,8 +1,0 @@
-
-telegram:
-  token: 5878743826:AAE3glYPcHVULRyPMZfxnPeEGayDrRRTgcA
-  port: 8080
-redis:
-  host: localhost
-  port: 6379
-  expireMinutes: 5
