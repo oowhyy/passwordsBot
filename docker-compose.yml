@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  # app:
+  #   container_name: app
+  #   build:
+  #     context: .
+  #     args:
+  #       LOCAL: "true"
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #   links:
+  #     - db
+  #   networks:
+  #     - redisnet
+
+  db:
+    image: redis:7.0.11-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis:/data
+    networks:
+      - redisnet
+
+networks:
+  redisnet:
+    driver: bridge
+
+volumes:
+  redis:
+    driver: local
