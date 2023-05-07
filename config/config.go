@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 type Config struct {
@@ -13,7 +14,7 @@ type Config struct {
 }
 
 type Telegram struct {
-	Token string `yaml:"token"`
+	Token string `yaml:"token" env:"TOKEN" env-default:"noToken"`
 	Port  string `yaml:"port" env-default:"8080"`
 }
 

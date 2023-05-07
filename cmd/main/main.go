@@ -5,6 +5,7 @@ import (
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+
 	"github.com/oowhyy/passwordbot/config"
 	"github.com/oowhyy/passwordbot/internal/storage/redis"
 	"github.com/oowhyy/passwordbot/internal/telegram"
@@ -12,30 +13,11 @@ import (
 
 func main() {
 	cfg := config.GetConfig()
+
 	// database setup
 	addr := fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)
 	rdb := redis.NewRedisStorage(addr, cfg.Redis.Password, cfg.Redis.DB, cfg.Redis.ExpireMinutes)
 	log.Println("connected to redis")
-
-	// err := rdb.Set(ctx, "key", "value", 0).Err()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// val, err := rdb.Get(ctx, "key").Result()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Println("key", val)
-
-	// val2, err := rdb.Get(ctx, "key2").Result()
-	// if err == redis.Nil {
-	// 	fmt.Println("key2 does not exist")
-	// } else if err != nil {
-	// 	panic(err)
-	// } else {
-	// 	fmt.Println("key2", val2)
-	// }
 
 	// bot setup
 	botApi, err := tgbotapi.NewBotAPI(cfg.Telegram.Token)
