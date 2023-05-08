@@ -13,8 +13,8 @@ import (
 var ctx = context.Background()
 
 type RedisStorage struct {
-	Client        *redis.Client
-	ExpireSeconds time.Duration
+	Client         *redis.Client
+	ExpireDuration time.Duration
 }
 
 func (rs *RedisStorage) CompositeKey(username string, service string) string {
@@ -30,12 +30,12 @@ func NewRedisStorage(addr string, password string, db int, expire int) (*RedisSt
 	if err := client.Ping(context.Background()).Err(); err != nil {
 		return nil, errors.New("unable to connect to redis")
 	}
-	return &RedisStorage{Client: client, ExpireSeconds: time.Second * time.Duration(expire)}, nil
+	return &RedisStorage{Client: client, ExpireDuration: time.Second * time.Duration(expire)}, nil
 }
 
 func (rs *RedisStorage) Set(username string, item *storage.Item) error {
 	key := rs.CompositeKey(username, item.Service)
-	if err := rs.Client.Set(ctx, key, item.Password, rs.ExpireSeconds).Err(); err != nil {
+	if err := rs.Client.Set(ctx, key, item.Password, rs.ExpireDuration).Err(); err != nil {
 		return err
 	}
 	return nil
@@ -67,5 +67,5 @@ func (rs *RedisStorage) Delete(username string, service string) (int64, error) {
 }
 
 func (rs *RedisStorage) Expire() time.Duration {
-	return rs.ExpireSeconds
+	return rs.ExpireDuration
 }

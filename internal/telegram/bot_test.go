@@ -5,20 +5,24 @@ import (
 	"testing"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/oowhyy/passwordbot/internal/storage"
 	"github.com/oowhyy/passwordbot/internal/storage/redis"
 	"github.com/stretchr/testify/suite"
 )
 
-func newBaseMessage(text string) *tgbotapi.Message {
+var testUser1 = "testUser1"
+var testUser2 = "testUser2"
+
+func newBaseMessage(want string) *tgbotapi.Message {
 	return &tgbotapi.Message{
 		MessageID: 123,
 		From: &tgbotapi.User{
-			UserName: "testUser",
+			UserName: testUser1,
 		},
 		Chat: &tgbotapi.Chat{
 			ID: 42,
 		},
-		Text: text,
+		Text: want,
 	}
 }
 
@@ -26,7 +30,7 @@ func newBaseCommand(command string) *tgbotapi.Message {
 	return &tgbotapi.Message{
 		MessageID: 123,
 		From: &tgbotapi.User{
-			UserName: "testUser",
+			UserName: testUser1,
 		},
 		Chat: &tgbotapi.Chat{
 			ID: 42,
@@ -57,27 +61,24 @@ func (bts *BotTestSuite) SetupSuite() {
 	bts.bot = NewBot(nil, testdb)
 }
 
-// func (its *IntTestSuite) BeforeTest(suiteName, testName string) {
-// 	if testName == "TestCalculate_Error" {
-// 		return
-// 	}
-// 	seedTestTable(its, its.db) // ts -> price=1, ts+1min -> price=2
-// }
+func (bts *BotTestSuite) SetupTest() {
+	bts.bot.storage.Set(testUser1, &storage.Item{
+		Service:  "predefined",
+		Password: "password",
+	})
+}
 
-// func (its *IntTestSuite) TearDownSuite() {
-// 	tearDownDatabase(its)
-// }
-
-// func (its *IntTestSuite) TearDownTest() {
-// 	cleanTable(its)
-// }
+func (bts *BotTestSuite) TearDownTest() {
+	bts.bot.userStates = map[string]State{}
+	bts.bot.storage.Delete(testUser1, "predefined")
+}
 
 func (bts *BotTestSuite) TestStart() {
 
 	message := newBaseCommand("/start")
 	res := bts.bot.HandleAny(message).Text
-	text := fmt.Sprintf(msgStart, bts.bot.storage.Expire())
-	bts.Require().Equal(text, res)
+	want := fmt.Sprintf(msgStart, int(bts.bot.storage.Expire().Seconds()))
+	bts.Require().Equal(want, res)
 }
 
 func (bts *BotTestSuite) TestUnknown() {
@@ -86,52 +87,68 @@ func (bts *BotTestSuite) TestUnknown() {
 	bts.Require().Equal(msgUnknownCommand, res)
 }
 
-// func (its *IntTestSuite) TestCalculate() {
+func (bts *BotTestSuite) TestSetNew() {
+	message := newBaseCommand("/set")
+	res := bts.bot.HandleAny(message).Text
+	want := msgNewSet
+	bts.Require().Equal(want, res)
+}
 
-// 	actual, err := its.calculator.PriceIncrease()
+func (bts *BotTestSuite) TestSetDialogue() {
+	message := newBaseCommand("/set")
+	res := bts.bot.HandleAny(message).Text
+	want := msgNewSet
+	bts.Require().Equal(want, res)
+	message = newBaseMessage("serv pass")
+	res = bts.bot.HandleAny(message).Text
+	want = fmt.Sprintf(msgOKSet, "pass", "serv")
+	bts.Require().Equal(want, res)
+}
 
-// 	its.Nil(err)
-// 	its.Equal(100.0, actual)
+func (bts *BotTestSuite) TestSetGet() {
+	// set step 1
+	message := newBaseCommand("/set")
+	res := bts.bot.HandleAny(message).Text
+	want := msgNewSet
+	bts.Require().Equal(want, res)
+	// set step 2
+	message = newBaseMessage("serv pass")
+	res = bts.bot.HandleAny(message).Text
+	want = fmt.Sprintf(msgOKSet, "pass", "serv")
+	bts.Require().Equal(want, res)
+	// get step 1
+	message = newBaseCommand("/get")
+	res = bts.bot.HandleAny(message).Text
+	want = msgNewGet
+	bts.Require().Equal(want, res)
+	// get step 2
+	message = newBaseMessage("serv")
+	res2 := bts.bot.HandleAny(message)
+	want = "pass"
+	bts.Require().Equal(want, res2.Text)
+	bts.Require().Equal(res2.ReplyToMessageID, message.MessageID)
+}
 
-// }
+func (bts *BotTestSuite) TestDelDialogue() {
+	// del step 2
+	message := newBaseCommand("/del")
+	res := bts.bot.HandleAny(message).Text
+	want := msgNewDel
+	bts.Require().Equal(want, res)
+	// del step 2
+	message = newBaseMessage("predefined")
+	res = bts.bot.HandleAny(message).Text
+	want = fmt.Sprintf(msgOKDel, "predefined")
+	bts.Require().Equal(want, res)
+}
 
-// Helper functions
-
-// func seedTestTable(its *IntTestSuite, db *sql.DB) {
-// 	its.T().Log("seeding test table")
-
-// 	for i := 1; i <= 2; i++ {
-// 		_, err := db.Exec("INSERT INTO stockprices (timestamp, price) VALUES ($1,$2)", time.Now().Add(time.Duration(i)*time.Minute), float64(i))
-// 		if err != nil {
-// 			its.FailNowf("unable to seed table", err.Error())
-// 		}
-// 	}
-// }
-
-// func cleanTable(its *IntTestSuite) {
-// 	its.T().Log("cleaning database")
-
-// 	_, err := its.db.Exec(`DELETE FROM stockprices`)
-// 	if err != nil {
-// 		its.FailNowf("unable to clean table", err.Error())
-// 	}
-// }
-
-// func tearDownDatabase(its *IntTestSuite) {
-// 	its.T().Log("tearing down database")
-
-// 	_, err := its.db.Exec(`DROP TABLE stockprices`)
-// 	if err != nil {
-// 		its.FailNowf("unable to drop table", err.Error())
-// 	}
-
-// 	_, err = its.db.Exec(`DROP DATABASE stockprices_test`)
-// 	if err != nil {
-// 		its.FailNowf("unable to drop database", err.Error())
-// 	}
-
-// 	err = its.db.Close()
-// 	if err != nil {
-// 		its.FailNowf("unable to close database", err.Error())
-// 	}
-// }
+func (bts *BotTestSuite) TestTwoUsers() {
+	message := newBaseCommand("/get")
+	res := bts.bot.HandleAny(message).Text
+	want := msgNewGet
+	bts.Require().Equal(want, res)
+	message2 := newBaseCommand("/get")
+	message2.From.UserName = testUser2
+	res = bts.bot.HandleAny(message2).Text
+	bts.Require().Equal(want, res)
+}

@@ -33,7 +33,7 @@ func NewBot(api *tgbotapi.BotAPI, db storage.Storage) *Bot {
 func (b *Bot) Start() error {
 	log.Printf("Authorized on account %s", b.api.Self.UserName)
 	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 15
+	u.Timeout = 60
 	updates := b.api.GetUpdatesChan(u)
 	for update := range updates {
 		if update.Message == nil { // ignore any non-Message Updates
@@ -41,6 +41,7 @@ func (b *Bot) Start() error {
 		}
 		// log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 		res := b.HandleAny(update.Message)
+		res.ParseMode = "MarkdownV2"
 		_, err := b.api.Send(res)
 		if err != nil {
 			log.Println("send reply failed")
