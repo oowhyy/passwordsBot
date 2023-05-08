@@ -16,7 +16,11 @@ func main() {
 
 	// database setup
 	addr := fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)
-	rdb := redis.NewRedisStorage(addr, cfg.Redis.Password, cfg.Redis.DB, cfg.Redis.ExpireMinutes)
+	rdb, err := redis.NewRedisStorage(addr, cfg.Redis.Password, cfg.Redis.DB, cfg.Redis.ExpireSeconds)
+	log.Println("CONFIG: ", cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Println("connected to redis")
 
 	// bot setup

@@ -39,8 +39,8 @@ func (b *Bot) Start() error {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-		res := b.handleAny(update.Message)
+		// log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+		res := b.HandleAny(update.Message)
 		_, err := b.api.Send(res)
 		if err != nil {
 			log.Println("send reply failed")

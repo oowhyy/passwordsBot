@@ -1,9 +1,14 @@
 package telegram
 
-import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+import (
+	"fmt"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+)
 
 func (b *Bot) startCommand(msg *tgbotapi.Message) tgbotapi.MessageConfig {
-	res := tgbotapi.NewMessage(msg.Chat.ID, msgStart)
+	text := fmt.Sprintf(msgStart, b.storage.Expire())
+	res := tgbotapi.NewMessage(msg.Chat.ID, text)
 	return res
 }
 

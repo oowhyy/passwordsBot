@@ -4,7 +4,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func (b *Bot) handleAny(msg *tgbotapi.Message) tgbotapi.MessageConfig {
+func (b *Bot) HandleAny(msg *tgbotapi.Message) tgbotapi.MessageConfig {
 	usr := msg.From.UserName
 	// some state
 	if state, ok := b.userStates[usr]; ok {

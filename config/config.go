@@ -23,7 +23,7 @@ type StorageConfig struct {
 	Port          string `yaml:"port" env-default:"6379"`
 	DB            int    `yaml:"db" env-default:"0"`
 	Password      string `yaml:"password" env-default:""`
-	ExpireMinutes int    `yaml:"expireMinutes" env-default:"5"`
+	ExpireSeconds int    `yaml:"expireSeconds" env-default:"5"`
 }
 
 var instance *Config
