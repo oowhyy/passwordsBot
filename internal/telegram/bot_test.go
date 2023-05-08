@@ -53,7 +53,7 @@ func TestBottTestSuite(t *testing.T) {
 
 func (bts *BotTestSuite) SetupSuite() {
 	// test DB: 1
-	testdb, err := redis.NewRedisStorage("localhost:6379", "", 1)
+	testdb, err := redis.NewRedisStorage("localhost:6380", "", 1)
 	if err != nil {
 		bts.FailNowf("unable to connect to database", err.Error())
 	}

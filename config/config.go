@@ -19,11 +19,12 @@ type Telegram struct {
 }
 
 type StorageConfig struct {
-	Host          string `yaml:"host" env-default:"localhost"`
-	Port          string `yaml:"port" env-default:"6379"`
-	DB            int    `yaml:"db" env-default:"0"`
-	Password      string `yaml:"password" env-default:""`
-	ExpireSeconds int    `yaml:"expireSeconds" env-default:"5"`
+	Host     string `yaml:"host" env-default:"localhost"`
+	Port     string `yaml:"port" env-default:"6379"`
+	DB       int    `yaml:"db" env-default:"0"`
+	Password string `yaml:"password" env-default:""`
+	TestHost string `yaml:"testHost" env-default:"localhost"`
+	TestPort string `yaml:"testPort" env-default:"6380"`
 }
 
 var instance *Config

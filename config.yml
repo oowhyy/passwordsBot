@@ -3,6 +3,6 @@
 telegram:
   port: 8080
 redis:
-  host: localhost
+  host: redis
   port: 6379
   
