@@ -53,7 +53,6 @@ func TestBottTestSuite(t *testing.T) {
 
 func (bts *BotTestSuite) SetupSuite() {
 	// test DB: 1
-	// test expire time: 1 second
 	testdb, err := redis.NewRedisStorage("localhost:6379", "", 1)
 	if err != nil {
 		bts.FailNowf("unable to connect to database", err.Error())
@@ -70,7 +69,9 @@ func (bts *BotTestSuite) SetupTest() {
 
 func (bts *BotTestSuite) TearDownTest() {
 	bts.bot.userStates = map[string]State{}
-	bts.bot.storage.Delete(testUser1, "predefined")
+	if err := bts.bot.storage.TearDown(); err != nil {
+		bts.FailNowf("db error", err.Error())
+	}
 }
 
 func (bts *BotTestSuite) TestStart() {

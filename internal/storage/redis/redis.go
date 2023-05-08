@@ -63,3 +63,8 @@ func (rs *RedisStorage) Delete(username string, service string) (int64, error) {
 	}
 	return res, nil
 }
+
+func (rs *RedisStorage) TearDown() error {
+	_, err := rs.Client.FlushDB(ctx).Result()
+	return err
+}

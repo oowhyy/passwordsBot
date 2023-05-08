@@ -30,7 +30,7 @@ func NewBot(api *tgbotapi.BotAPI, db storage.Storage) *Bot {
 		api:        api,
 		storage:    db,
 		userStates: map[string]State{},
-		expire:     time.Second * 10,
+		expire:     time.Second * 30,
 		messageQ:   []tgbotapi.Message{},
 	}
 }
@@ -47,7 +47,6 @@ func (b *Bot) Start() error {
 	u.Timeout = 60
 	updates := b.api.GetUpdatesChan(u)
 	for update := range updates {
-		log.Println("HERE")
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
@@ -70,7 +69,11 @@ func (b *Bot) clearChat() {
 		if time.Since(t) > b.expire {
 			b.messageQ = b.messageQ[1:]
 			delete := tgbotapi.NewDeleteMessage(m.Chat.ID, m.MessageID)
-			b.api.Request(delete)
+			_, err := b.api.Request(delete)
+			if err != nil {
+				log.Println("Unable to delete messages", err)
+				break
+			}
 		} else {
 			break
 		}
