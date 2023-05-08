@@ -4,12 +4,11 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func (b *Bot) handleAny(msg *tgbotapi.Message) error {
+func (b *Bot) handleAny(msg *tgbotapi.Message) tgbotapi.MessageConfig {
 	usr := msg.From.UserName
 	// some state
 	if state, ok := b.userStates[usr]; ok {
-		err := b.handleState(state, msg)
-		return err
+		return b.handleState(state, msg)
 	}
 	// default state, some command
 	if msg.IsCommand() {
@@ -19,7 +18,7 @@ func (b *Bot) handleAny(msg *tgbotapi.Message) error {
 	return b.unknownCommand(msg)
 }
 
-func (b *Bot) handleCommand(msg *tgbotapi.Message) error {
+func (b *Bot) handleCommand(msg *tgbotapi.Message) tgbotapi.MessageConfig {
 	switch msg.Command() {
 	case commandStart:
 		return b.startCommand(msg)

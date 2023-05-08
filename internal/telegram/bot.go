@@ -40,7 +40,11 @@ func (b *Bot) Start() error {
 			continue
 		}
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-		b.handleAny(update.Message)
+		res := b.handleAny(update.Message)
+		_, err := b.api.Send(res)
+		if err != nil {
+			log.Println("send reply failed")
+		}
 	}
 	return nil
 }

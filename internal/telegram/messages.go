@@ -19,5 +19,10 @@ const (
 	msgOKSet = "Установлен пароль %s\nдля сервиса %s"
 	msgOKDel = "Пароль для сервиса %s удален"
 
+	msgErrDel     = "Ошибка базы данных"
+	msgErrGet     = "Ошибка базы данных"
+	msgErrSet     = "Ошибка базы данных"
+	msgErrUnknown = "Что-то пошло не так..."
+
 	msgUnknownCommand = "Я не знаю такую команду"
 )
