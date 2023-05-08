@@ -16,7 +16,7 @@ func main() {
 
 	// database setup
 	addr := fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)
-	rdb, err := redis.NewRedisStorage(addr, cfg.Redis.Password, cfg.Redis.DB, cfg.Redis.ExpireSeconds)
+	rdb, err := redis.NewRedisStorage(addr, cfg.Redis.Password, cfg.Redis.DB)
 	log.Println("CONFIG: ", cfg)
 	if err != nil {
 		log.Fatal(err)

@@ -7,7 +7,7 @@ import (
 )
 
 func (b *Bot) startCommand(msg *tgbotapi.Message) tgbotapi.MessageConfig {
-	text := fmt.Sprintf(msgStart, int(b.storage.Expire().Seconds()))
+	text := fmt.Sprintf(msgStart, int(b.expire.Seconds()))
 	res := tgbotapi.NewMessage(msg.Chat.ID, text)
 	return res
 }

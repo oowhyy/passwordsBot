@@ -54,7 +54,7 @@ func TestBottTestSuite(t *testing.T) {
 func (bts *BotTestSuite) SetupSuite() {
 	// test DB: 1
 	// test expire time: 1 second
-	testdb, err := redis.NewRedisStorage("localhost:6379", "", 1, 1)
+	testdb, err := redis.NewRedisStorage("localhost:6379", "", 1)
 	if err != nil {
 		bts.FailNowf("unable to connect to database", err.Error())
 	}
@@ -77,7 +77,7 @@ func (bts *BotTestSuite) TestStart() {
 
 	message := newBaseCommand("/start")
 	res := bts.bot.HandleAny(message).Text
-	want := fmt.Sprintf(msgStart, int(bts.bot.storage.Expire().Seconds()))
+	want := fmt.Sprintf(msgStart, int(bts.bot.expire.Seconds()))
 	bts.Require().Equal(want, res)
 }
 

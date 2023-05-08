@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/oowhyy/passwordbot/internal/storage"
 	"github.com/redis/go-redis/v9"
@@ -13,15 +12,14 @@ import (
 var ctx = context.Background()
 
 type RedisStorage struct {
-	Client         *redis.Client
-	ExpireDuration time.Duration
+	Client *redis.Client
 }
 
 func (rs *RedisStorage) CompositeKey(username string, service string) string {
 	return fmt.Sprintf("{%s}%s", username, service)
 }
 
-func NewRedisStorage(addr string, password string, db int, expire int) (*RedisStorage, error) {
+func NewRedisStorage(addr string, password string, db int) (*RedisStorage, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: password,
@@ -30,12 +28,12 @@ func NewRedisStorage(addr string, password string, db int, expire int) (*RedisSt
 	if err := client.Ping(context.Background()).Err(); err != nil {
 		return nil, errors.New("unable to connect to redis")
 	}
-	return &RedisStorage{Client: client, ExpireDuration: time.Second * time.Duration(expire)}, nil
+	return &RedisStorage{Client: client}, nil
 }
 
 func (rs *RedisStorage) Set(username string, item *storage.Item) error {
 	key := rs.CompositeKey(username, item.Service)
-	if err := rs.Client.Set(ctx, key, item.Password, rs.ExpireDuration).Err(); err != nil {
+	if err := rs.Client.Set(ctx, key, item.Password, 0).Err(); err != nil {
 		return err
 	}
 	return nil
@@ -64,8 +62,4 @@ func (rs *RedisStorage) Delete(username string, service string) (int64, error) {
 		return 0, err
 	}
 	return res, nil
-}
-
-func (rs *RedisStorage) Expire() time.Duration {
-	return rs.ExpireDuration
 }

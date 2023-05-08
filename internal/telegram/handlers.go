@@ -5,6 +5,7 @@ import (
 )
 
 func (b *Bot) HandleAny(msg *tgbotapi.Message) tgbotapi.MessageConfig {
+	b.messageQ = append(b.messageQ, *msg)
 	usr := msg.From.UserName
 	// some state
 	if state, ok := b.userStates[usr]; ok {
